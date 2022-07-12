@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    
+    <link rel="apple-touch-icon" sizes="76x76" href="/null">
+    <link rel="icon" type="image/png" href="/null">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+    <title>CVPR 2020 Social-STGCNN：基于图卷积的行人轨迹预测 - Hexo</title>
+    
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    
+    
+    <meta name="description" content="">
+    <meta name="author" content="John Doe">
+    <meta name="keywords" content="">
+    <style>
+
+
+    
+    :root{
+        --shadow-color: rgba(0,0,0,0.2);
+        --sec-shadow: rgba(0,0,0,0.03);
+        --shadow-hover-color: rgba(0,0,0,0.28);
+        --first-text-color: #475b6d;
+        --second-text-color: #37475b;
+        --third-text-color: #858585;
+        --default-text-color: #505050;
+        --default-link-color: #007bff;
+        --link-color: #000000;
+        --second-link-color: #4F9BFA;
+        --code-color:rgba(27,31,35,.05);
+        --post-bkg-color: #fff;
+        --page-bkg-color: #f2f5f8;
+        --nav-a-hover-color: #3498db;
+        --post-sec-text-color: #718096;
+        --sec-bkg: #f2f5f8;
+        --color-mode: 'light';
+        --bkg-h: rgba(255,255,255,0.6);
+        --bkg-m: #e1e4e8;
+        --home-title-color: #4169E1;
+        --shadow: 0 4px 10px rgba(0,2,4,0.06),0 0 1px rgba(0,2,4,0.11);
+        --hr-color: #ddd;
+        --bg-t: #f4f4f4;
+        --nav-bkg: rgba(255,255,255,0.6);
+    }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-mode: 'dark';
+  }
+
+  :root:not([data-theme]) {
+    --first-text-color: hsla(0,0%,100%,0.92);
+    --second-text-color: hsla(0,0%,100%,0.86);
+    --third-text-color: #a7a9ad;
+    --default-text-color: #505050;
+    --default-link-color: #1589e9;
+    --link-color: #000000;
+    --second-link-color: #30a9de;
+    --post-bkg-color: #252d38;
+    --page-bkg-color: #181c27;
+    --nav-a-hover-color: #3498db;
+    --post-sec-text-color: #a7a9ad;
+    --sec-bkg: #364151;
+    --bkg-h: rgba(255,255,255,0.2);
+    --bkg-m: rgba(255,255,255,0.1);
+    --home-title-color: rgb(226, 82, 90);
+    --code-color:#3e4b5e;
+    --shadow: none;
+    --hr-color: #718096;
+    --bg-t: #364151;
+    --nav-bkg: rgba(13,17,23,0.6);
+  }
+}
+
+[data-theme='dark'] {
+    --shadow-color: rgba(0,0,0,0.2);
+    --shadow-hover-color: rgba(0,0,0,0.28);
+    --first-text-color: hsla(0,0%,100%,0.92);
+    --second-text-color: hsla(0,0%,100%,0.86);
+    --third-text-color: #a7a9ad;
+    --default-text-color: #505050;
+    --default-link-color: #1589e9;
+    --link-color: #000000;
+    --second-link-color: #30a9de;
+    --post-bkg-color: #252d38;
+    --page-bkg-color: #181c27;
+    --nav-a-hover-color: #3498db;
+    --post-sec-text-color: #a7a9ad;
+    --sec-bkg: #364151;
+    --bkg-h: rgba(255,255,255,0.2);
+    --bkg-m: rgba(255,255,255,0.1);
+    --home-title-color: rgb(226, 82, 90);
+    --code-color:#3e4b5e;
+    --shadow: none;
+    --hr-color: #718096;
+    --bg-t: #364151;
+    --nav-bkg: rgba(13,17,23,0.6);
+}
+
+</style>
+
+
+
+<style>
+#page-main,footer,.p-btn{
+    display: none;
+}
+html,body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: overlay;
+}
+body{
+    background-color: var(--page-bkg-color);
+    color: var(--second-text-color);
+    overflow-y: scroll;
+}
+a {
+    color: var(--default-link-color);
+    text-decoration: none;
+    background-color: transparent;
+}
+a:hover{
+    color: var(--second-link-color);
+}
+.main-content,.post-card-main{
+    margin: 30px;
+}
+
+
+
+@media (max-width: 410px){
+    .post-card-main{
+        max-width: 350px!important;
+    }
+}
+
+@media (max-width: 980px){
+    .post-card-main{
+        max-width: 520px!important;
+    }
+}
+
+
+@media (min-width: 780px){ 
+    h3{
+        font-size: 1.5rem;
+        line-height: 1.5em;
+    }
+}
+@media (min-width: 1280px){ 
+    h3{
+        font-size: 1.7rem;
+        line-height: 1.5em;
+    }
+}
+@media (min-width: 2096px){ 
+    h3{
+        font-size: 1.8rem;
+        line-height: 1.5em;
+    }
+}
+
+.text-center{
+    text-align: center!important;
+}
+.middle-center{
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    height: 100%;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    height: 54px;
+    padding: 0 1.25rem;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--bkg-m);
+    background-color: var(--nav-bkg);
+}
+header .header__left, header .header__right {
+    display: flex;
+    align-items: center;
+    font-family: rubik,sans-serif,Varela Round;
+}
+header .header__left .logo__text {
+    font-size: 18px;
+    font-weight: 450;
+    padding: 14.5px 10px;
+    border-radius: 5px;
+    color: var(--second-text-color);
+}
+header .header__right .navbar__menus {
+    height: 54px;
+    padding: 0 0 0 15px;
+}
+header .header__right .button {
+    color: var(--second-text-color);
+}
+header .header__right .navbar__menus .navbar-menu {
+    display: inline-block;
+    align-items: center;
+    height: 54px;
+    padding: 0 10px;
+    font-size: 16px;
+    line-height: 54px;
+}
+header .header__right .dropdown-icon {
+    display: none;
+    height: 54px;
+    padding: 15px 10px;
+    border: 0;
+    background-color: transparent;
+}
+header .header__right .dropdown-menus {
+    line-height: 2rem;
+    animation: slide-in .15s ease 1;
+    display: none;
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: calc(54px + 10px);
+    border-radius: 6px;
+    padding: 24px;
+    background-color: var(--page-bkg-color);
+    border: 1px solid var(--bkg-m);
+    z-index: 9999;
+    justify-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+header .header__right #btn-search, header .header__right #btn-toggle-dark{
+    display: inline-block;
+    padding:  18px 10px;
+    height: 25px;
+}
+header .header__right #btn-dropdown{
+  display: inline-block;
+  padding:  13.5px 0;
+}
+header .header__right .dropdown-menus .dropdown-menu {
+    padding: 10px;
+    color: var(--second-text-color);
+}
+@media screen and (max-width: 764px){
+.navbar__menus {
+    display: none!important;
+}
+.dropdown-icon {
+    display: inline-block!important;
+}
+}
+.p-btn{
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    contain: layout;
+}
+.toc-btn,.click-btn{
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    align-items: center;
+    margin-top: .5rem;
+    font-size: .75rem;
+    background-color: var(--sec-bkg);
+    display: block;
+    padding: 0.9rem;
+    box-shadow: 0 0.3rem 0.6rem rgba(48,55,66,.15);
+    border: none;
+    border-radius: 0.5rem;
+    line-height: 1;
+    color: var(--first-text-color);
+}
+.toc-link{
+    color: var(--second-text-color);
+}
+
+#css-loading h3{
+    font-weight: 500;
+    font-size: 1.4rem;
+    text-align: center;
+    position: fixed;
+    top: 200px;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    animation: cssLoad;
+    animation-delay: 0.3s;
+    -webkit-animation: cssLoad;
+    -webkit-animation-delay: 0.3s;
+}
+@keyframes cssLoad {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 0.9;
+    }
+}
+
+
+.memorial {
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    filter: grayscale(100%);
+    filter:progid:DXImageTransform.Microsoft.BasicImage(grayscale=1); filter:gray;
+}
+
+
+    .post-copyright:after {
+        position: absolute;
+        color: #fff;
+        background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 496 512'%3E%3Cpath fill='gray' d='M245.8 214.9l-33.2 17.3c-9.4-19.6-25.2-20-27.4-20-22.2 0-33.3 14.6-33.3 43.9 0 23.5 9.2 43.8 33.3 43.8 14.4 0 24.6-7 30.5-21.3l30.6 15.5a73.2 73.2 0 01-65.1 39c-22.6 0-74-10.3-74-77 0-58.7 43-77 72.6-77 30.8-.1 52.7 11.9 66 35.8zm143 0l-32.7 17.3c-9.5-19.8-25.7-20-27.9-20-22.1 0-33.2 14.6-33.2 43.9 0 23.5 9.2 43.8 33.2 43.8 14.5 0 24.7-7 30.5-21.3l31 15.5c-2 3.8-21.3 39-65 39-22.7 0-74-9.9-74-77 0-58.7 43-77 72.6-77C354 179 376 191 389 214.8zM247.7 8C104.7 8 0 123 0 256c0 138.4 113.6 248 247.6 248C377.5 504 496 403 496 256 496 118 389.4 8 247.6 8zm.8 450.8c-112.5 0-203.7-93-203.7-202.8 0-105.5 85.5-203.3 203.8-203.3A201.7 201.7 0 01451.3 256c0 121.7-99.7 202.9-202.9 202.9z'/%3E%3C/svg%3E");
+        content: ' ';
+        height: 10rem;
+        width: 10rem;
+        right: -2rem;
+        top: -2rem;
+        opacity: .1;
+    }
+
+</style>
+
+    
+
+    
+        <!--
+        <link rel="stylesheet" href="/css/page.css" media="print"
+            onload="this.media='all';this.onload=null">
+        <noscript>-->
+            <link rel="stylesheet" href="/css/page.css">
+        <!--</noscript>-->
+    
+    
+    <link rel="stylesheet" href="/css/main.css" media="print" onload="this.media='all';this.onload=null">
+    <noscript>
+        <link rel="stylesheet" href="/css/main.css">
+    </noscript>
+
+    
+    <script src="/js/main.js"></script>
+    
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+    <body>
+        <header>
+            
+<div class="header__left">
+	<a href="/" class="button"><span class="logo__text">Theme Miracle</span></a>
+</div>
+<div class="header__right">
+	<div class="navbar__menus">
+		
+	</div>
+	
+	<a href="/search/" class="button">
+		<div id="btn-search">
+			<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 1024 1024" width="24" height="24" fill="currentColor"
+				stroke="currentColor" stroke-width="32">
+				<path
+					d="M192 448c0-141.152 114.848-256 256-256s256 114.848 256 256-114.848 256-256 256-256-114.848-256-256z m710.624 409.376l-206.88-206.88A318.784 318.784 0 0 0 768 448c0-176.736-143.264-320-320-320S128 271.264 128 448s143.264 320 320 320a318.784 318.784 0 0 0 202.496-72.256l206.88 206.88 45.248-45.248z">
+				</path>
+			</svg>
+		</div>
+	</a>
+	
+	<a href="javaScript:void(0);" class="button" id="btn-toggle-dark">
+		<div>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+			</svg>
+		</div>
+	</a>
+	<a href="javaScript:void(0);" class="dropdown-icon button">
+		<div id="btn-dropdown">
+			<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 1024 1024" width="24" height="24" fill="currentColor"
+				stroke="currentColor" stroke-width="32" stroke-linecap="round">
+				<path
+					d="M903.43 561.52H148.8c-13.25 0-24-10.75-24-24s10.75-24 24-24h754.63c13.25 0 24 10.75 24 24s-10.75 24-24 24zM903.43 204.31H148.8c-13.25 0-24-10.75-24-24s10.75-24 24-24h754.63c13.25 0 24 10.75 24 24s-10.75 24-24 24zM903.43 918.73H148.8c-13.25 0-24-10.75-24-24s10.75-24 24-24h754.63c13.25 0 24 10.75 24 24s-10.75 24-24 24z"
+					fill="currentColor"></path>
+			</svg>
+		</div>
+	</a>
+	<div class="dropdown-menus" id="dropdown-menus">
+		
+	</div>
+</div>
+
+        </header>
+        <div id="top"></div>
+        <div id="page-main" class="main-content">
+        <div class="mg-top">
+            
+
+<article class="page">
+<div id="post-meta-m">
+    <div class="post-meta" id="post-meta">
+  <h3>CVPR 2020 Social-STGCNN：基于图卷积的行人轨迹预测</h3>
+    
+      <span class="post-meta-label">
+        John Doe
+      </span>
+    
+    
+      <span class="post-meta-label">
+        <span class="p-dot"></span>
+        <time datetime="2022-07-12 22:24" pubdate>
+          2022-07-12
+        </time>
+      </span>
+    
+    
+      
+      <span class="post-meta">
+        <span class="p-dot"></span>
+        共 2.1k 字
+      </span>
+    
+    
+    
+  </div>
+  
+</div>
+<div class="article-m">
+  <div class="post-toc">
+    
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E6%95%B0%E6%8D%AE%E6%98%AF%E6%80%8E%E6%A0%B7%E8%A2%AB%E5%A4%84%E7%90%86%E7%9A%84%E5%91%A2%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">一、数据是怎样被处理的呢？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%8C%E3%80%81ST-GCNN%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">二、ST_GCNN算法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%8D%9F%E5%A4%B1"><span class="toc-number">3.</span> <span class="toc-text">三、损失</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%B5%8B%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">四、测试</span></a></li></ol>
+    
+  </div>
+    <div id="article">
+      <div id="post-content" class="markdown-body textretty">
+        <p>原文链接：<a target="_blank" rel="noopener" href="https://openaccess.thecvf.com/content_CVPR_2020/papers/Mohamed_Social-STGCNN_A_Social_Spatio-Temporal_Graph_Convolutional_Neural_Network_for_Human_CVPR_2020_paper.pdf#:~:text=The%20Social-STGCNN%20model%20consists%20of%20two%20main%20parts:,graph%20representation%20of%20pedestrian%20trajectories%20to%20extract%20features.">Social-STGCNN: A Social Spatio-Temporal Graph Convolutional Neural<br>Network for Human Trajectory Prediction</a><br>代码链接：<a target="_blank" rel="noopener" href="https://github.com/abduallahmohamed/Social-STGCNN">代码</a></p>
+<p>有一段时间没有更新博客了，这一段时间我在干嘛呢？回想起来除了每周定时的007外，只是单纯的懒。在写作风格上，坚持靠近于算法层面，而不是单纯的文章翻译、代码解析。那废话不多说，我们开始吧！</p>
+<h1 id="一、数据是怎样被处理的呢？"><a href="#一、数据是怎样被处理的呢？" class="headerlink" title="一、数据是怎样被处理的呢？"></a>一、数据是怎样被处理的呢？</h1><p>在涉及数据处理的时候，文字性的表达效果十分有限。举例来说，你会面对7个不同的场景，每个场景就是一段视频，每段视频由许多帧组成，每帧中存在许多行人，每位行人又有不同的运动轨迹，每条轨迹又有不同的特征。那如果你要做实验，你要怎么处理这一块复杂的数据？你可能会告诉我说，找到对标的实验代码，以它为框架进行修改不就ok。没有错，我的想法同你一样，所以说你为什么能看到我的博客。话说回来，即便有了前人的代码框架，你也需要明白数据处理的逻辑。总结来说，在&#x3D;&#x3D;Social-STGCNN&#x3D;&#x3D;当中，数据会被这样处理：为了便于叙述，我们假定只考虑一个场景，并且假定读者已经看过代码，下面的叙述才不会让你感到困惑。在这个场景中，或说这段视频中，存在很多帧，那首先你要做的事是先把每帧处理成对应的&#x3D;&#x3D;帧ID&#x3D;&#x3D;。举例来说，第0帧对应帧ID：0 ，第十帧对应帧ID：1，第20帧对应帧ID：2，……，第14390帧对应帧ID：933。为什么要这样处理呢？很显然不这样处理后续没法进行呀，这就好比每个人都有自己的姓名一样。紧接着，给每帧标上序号以后，就要确定该帧 &#x2F; 该帧ID下所有行人轨迹吧。注意：这里的<strong>所有人</strong>可重复。什么意思呢？假设在第0帧下有10个人，这10个人可不是只存在于第0帧下，第10帧下可以存在这批人。OK，我想你明白我在说什么。总结来说，我们现在将数据处理成了什么模样呢？我们给每帧标注了对应的ID，并且找到了该帧下的所有行人。</p>
+<p>接下来该怎么办呢?在上述处理的数据基础上，我们要进一步将其处理成mini-batch。怎么做呢？在帧ID上，我们以长度20为标准，步长为1进行Sample，这样长度为933的帧ID就被处理成了915个mini-batch。看到这你会不会疑问说915怎么得到的呢？我想留给读者思考会比较有意义，或者思考后在评论区@我吧。Anyway，现在得到了915个mini-batch，那我想问问读者朋友，每个mini-batch的维度是(20,4)吗？显然不会是(20,4)，因为我们刚才有交代过是步长为1逐步取得的数据嘛，换句话说就是每个mini-batch下的行人也是可重复的。下一步就很直接了，给每个mini-batch标上ID吧，标上ID后我们就要数一数每个mini-batch下都有几个人了，举例来说，mini-batch ID 0下有16个人，mini-batch ID 1下有16个人，…… ，mini-batch ID 915下有48个人；人数确定好后，就要进一步确定在每个ID下的每个人是否都符合&#x3D;&#x3D;要求&#x3D;&#x3D;。要求是什么呢？要求就是该行人尾帧对应的帧ID减去该行人首帧对应的帧ID要等于20。那为什么要这样做呢？你想想看我们的&#x3D;&#x3D;Social-STGCNN&#x3D;&#x3D;算法用的是图卷积，必须保证每一个节点都是相同的帧数才行，不然在时序建模上会出错。举例来说，mini-batch ID 0下有16个人只有4人符合要求，mini-batch ID 1下有16个人只有3人符合要求，……，mini-batch ID 915下有48个人只有12人符合要求。那符合要求的行人数目才是最终mini-batch所包含的人数，所以自然而然就得到实际上每个mini-batch的维度了，举例来说，mini-batch ID 0下有16个人只有4人符合要求，那它的维度就是(4,2,20)；mini-batch ID 1下有16个人只有3人符合要求，那它的维度就是(3,2,20)，……，mini-batch ID 915下有48个人只有12人符合要求，那它的维度就是(12,2,20)</p>
+<p>紧接着就很自然了，将每个mini-batch转换为Graph了，不过要注意，&#x3D;&#x3D;代码中将前8帧与后12帧分开了&#x3D;&#x3D;，希望读者明白我在说什么。<br><img src="https://img-blog.csdnimg.cn/f49faf378a194ced89bb7f5921cde443.jpeg" alt="数据处理过程"></p>
+<h1 id="二、ST-GCNN算法"><a href="#二、ST-GCNN算法" class="headerlink" title="二、ST_GCNN算法"></a>二、ST_GCNN算法</h1><p>&#x3D;&#x3D;ST-GCNN&#x3D;&#x3D;算法是一件想象力十足的事，为什么这样说呢？因为你去看它论文里给你的网络架构，很形象又很抽象，可能这就是定会大佬的风格吧。我最近喜欢干这样一件事，就是根据代码自己画它的网络框架，如果读者能够自己动动手，我相信你会有更深的理解。</p>
+<p>首先假定读者朋友已经知道Sequence是怎样构成Spatio-Temporal Graph的了，为什么要先假定，因为我的夜宵到了，这里就…。好，GCN的好处是降低了参数量，并且可以多帧的输入。现在假定下图所示的mini-batch中只有4个人，他们的交互关系与轨迹构成了一个时空图。有Graph我们可以得到其特征矩阵X，邻接矩阵A。注意：这里的特征是每个行人的相对位置，邻接矩阵做了论文中所述的加权处理与归一化处理。有了这俩宝贝，先喂给我们的GCN模块，也就是说GCN的输入来自两方面：特征矩阵X和邻接矩阵A。GCN实际上在干一件什么事呢？GCN实际上就是在提取行人的轨迹特征，并在最后实现图嵌入。GCN的输出会被喂给TCN，这一步主要是提取行人间的时域信息。那怎么做呢？对于在图上的时序信息的提取，我们可以用卷积的方式进行处理。举例来说，一个大小为(3,1)的卷积核在图的每个节点上从上到下、从左自右的滑动，得到了行人的时序信息。实际上，卷积的实质就是消息聚合。到这一步，就得到了聚合有行人间交互的时空特征了，但是一个很直接的想法是，做一个residual会不会更好呢？这样就能叠加一个全局的信息在里面，实际上代码也是这么做的，但是光看论文可啥也没说。OK,做到这一步那轨迹特征就编码完了，就下来就该解码了吧。解码器由多个具体来说是六个TPCNN构成。别被名字糊住了，TPCNN就是在时域维度上做卷积的CNN。第一层的TPCNN将输入8维映射到12维；中间四层TPCNN对时域特征做进一步的提取，输入12维输出12维，并且附带residual结构；经最后一层TPCNN输出概率分布的结果。<br><img src="https://img-blog.csdnimg.cn/4362fb1bb69143a2b4c13471a97c94d0.jpeg" alt="网络架构"></p>
+<h1 id="三、损失"><a href="#三、损失" class="headerlink" title="三、损失"></a>三、损失</h1><p>我们的算法输出的是一个多元高斯参数分布，那损失怎么做呢？首先明确一点，我们的损失是最小化负自然对数，所以怎么生成相应的概率值很关键。这里要假定读者看过代码。并且有自己的感悟，不然我怎么写都不是很有用。还记得之前有说代码中将8帧与12帧分开了吗？我们输入前8帧，输出后12帧的分布，与预留的12帧ground truth做损失，具体公式还得自己根据代码以及相关论文推导。我就不写了，夜宵都凉了…</p>
+<h1 id="四、测试"><a href="#四、测试" class="headerlink" title="四、测试"></a>四、测试</h1><p>测试阶段就比较easy了，只要你明白了上面的算法，测试阶段无非就是将得到的概率值转化为坐标，在进行一个ADE、FDE的计算。有时候真的懂不需要多说，一点就明白。</p>
+<p>OK,那就先写到这里，与大家共勉。</p>
+
+      </div>
+    </div>
+</div>
+
+
+<div class="post-footer">
+  
+  <div class="donate text-center">
+    <span>喜欢这篇文章？为什么不考虑打赏一下作者呢？</span>
+    <div class="donate-way">
+      
+    </div>
+  </div>
+  
+
+  <div class="post-copyright">
+    <p style="margin: 5px 0;">文章作者：<a href="/">John Doe</a></p>
+    <p style="margin: 5px 0;">文章链接：<a href="http://example.com/2022/07/12/CVPR%202020%20_%20Social-STGCNN%EF%BC%9A%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%8D%B7%E7%A7%AF%E7%9A%84%E8%A1%8C%E4%BA%BA%E8%BD%A8%E8%BF%B9%E9%A2%84%E6%B5%8B/">http://example.com/2022/07/12/CVPR%202020%20_%20Social-STGCNN%EF%BC%9A%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%8D%B7%E7%A7%AF%E7%9A%84%E8%A1%8C%E4%BA%BA%E8%BD%A8%E8%BF%B9%E9%A2%84%E6%B5%8B/</a></p>
+    <p style="margin: 5px 0;">版权声明：本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处，谢谢。</p>
+  </div>
+  
+</div>
+
+    <!-- Comments -->
+    <div class="comments">
+        
+        
+    </div>
+
+</article>
+
+
+        </div>
+        
+<footer class="text-center">
+    
+    
+    
+    
+    
+    <p>&copy;  2020 - 2021&nbsp;&nbsp;Theme Miracle</p>
+    
+    <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme by <a href="https://github.com/hifun-team/hexo-theme-miracle" target="_blank">Miracle</a></p>
+    
+    
+</footer>
+
+<div class="p-btn">
+    
+        <a class="toc-btn" id="toc-btn"><i id="i-menu"></i></a>
+    
+    <a href="#top" class="click-btn">
+      <i id="i-up"></i>
+    </a>
+</div>
+
+<!-- SCRIPTS -->
+
+
+
+
+
+
+
+<script>
+    document.getElementById("btn-dropdown").addEventListener('click', () => {
+      toggleClass("#dropdown-menus","display-inline");
+    });
+    console.log('\n' + ' %c Powered by Hexo Theme Miracle ' + ' %c https://github.com/hifun-team/hexo-theme-miracle ' + '\n' + '\n', 'color: #fff; background: #4F9BFA; padding:5px 0;', 'background: #FFF; padding:5px 0;');
+
+    
+
+    
+  /* 小彩蛋: 饮茶先啦 */
+  setTimeout(() => {
+    var time = new Date();
+    if (time.getHours() == 15) {
+      let comment = document.createComment(' 三点几嚟！饮茶先啦！ ');
+      document.body.insertBefore(comment, document.getElementsByTagName('header')[0]);
+    }
+  },1);
+    
+</script>
+
+
+<script>
+    var postImg = document.querySelectorAll("article[class=page] img");
+    for (let imgi = 0; imgi < postImg.length; imgi++) {
+        postImg[imgi].onclick = () => {
+            let zoomImg = document.createElement("div");
+            zoomImg.id = "zoomImg";
+            zoomImg.innerHTML = `<div id="zoom-picture"></div>
+    <div class="poptrox-overlay"
+        style="position: fixed; left: 0px; top: 0px; z-index: 20000; width: 100%; height: 100%; text-align: center; cursor: zoom-out; opacity: 1;">
+        <div style="display:inline-block;height:100%;vertical-align:middle;"></div>
+        <div
+            style="position:absolute;left:0;top:0;width:100%;height:100%;background:#000000;opacity:0;filter:alpha(opacity=0);">
+        </div>
+        <div class="poptrox-popup"
+            style="display: inline-block; vertical-align: middle; position: relative; z-index: 1; cursor: zoom-out; min-width: 10px; min-height: 10px; width: auto; height: auto;">
+            <div class="loader" style="display: none;"></div>
+            <div class="pic" style="text-indent: 0px;"><img
+                    src="${ postImg[imgi].srcset || postImg[imgi].src }" alt="Loading..."
+                    style="vertical-align: bottom; max-width: 85vw; max-height: 85vh;"></div>
+        </div>
+    </div>`;
+            document.body.appendChild(zoomImg);
+                document.querySelector("#zoomImg").onclick = () => {
+                    document.querySelector("#zoomImg").remove();
+                }
+        }
+    }
+    
+</script>
+
+
+
+
+    <script>
+        query("#toc-btn")[0].onclick = () => {
+            if (query(".post-toc")[0].innerHTML) {
+                toggleClass(".post-toc", "display-inline");
+            }
+        }
+
+        if (!query(".post-toc")[0].innerHTML) {
+            addClass("#toc-btn","display-none");
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+        </div>
+        <div id="css-loading">
+            <h3 class="text-center">加载中...</h3>
+        </div>
+        
+    </body>
+</html>
