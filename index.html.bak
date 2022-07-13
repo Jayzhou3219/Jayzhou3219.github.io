@@ -361,7 +361,7 @@ header .header__right .dropdown-menus .dropdown-menu {
         <header>
             
 <div class="header__left">
-	<a href="/" class="button"><span class="logo__text"><a href="https://github.com/Jayzhou3219/Jayzhou3219.github.io/">Jayzhou3219</span></a>
+	<a href="/" class="button"><span class="logo__text">Theme Miracle</span></a>
 </div>
 <div class="header__right">
 	<div class="navbar__menus">
@@ -410,10 +410,10 @@ header .header__right .dropdown-menus .dropdown-menu {
   <div id="index-banner" class="text-center middle-center">
     <div class="banner-text">
         <h3 id="banner-name">
-            深度科研的博客
+            Theme Miracle
         </h3>
         <p class="slogan">
-          月亮不会奔向你，但我会
+          一款简洁的单栏 Hexo 主题
         </p>
     </div>
 </div>
@@ -457,22 +457,15 @@ header .header__right .dropdown-menus .dropdown-menu {
         <h3 class="index-header">
           <a href="/2022/07/12/hello-world/">
           
-          Hello friends</a>
+          Hello World</a>
         </h3>
         <p class="index-excerpt">
             
-            欢迎访问我的博客！
-		</p>
-		
-		<p class="index-excerpt">
-		    无论你身在何方，身处何处，请永远记得：对未来最大的慷慨，是把一切留给现在！
-		</p>
-		<p class="index-excerpt">
-		    
-			Welcome to my blog! No matter where you are and where you are, please always remember that the greatest generosity to the future is to leave everything to the present!
-        
             
+              
             
+            Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+Quick
         </p>
         <div class="index-btm post-metas">
           
@@ -498,7 +491,7 @@ header .header__right .dropdown-menus .dropdown-menu {
     
     
     
-    <p>&copy;  2020 - 2021&nbsp;&nbsp;<a href="https://blog.csdn.net/m0_57541899?spm=1010.2135.3001.5343/">深度科研的博客</a>
+    <p>&copy;  2022 - &nbsp;&nbsp;深度科研</p>
     
     <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme by <a href="https://github.com/hifun-team/hexo-theme-miracle" target="_blank">Miracle</a></p>
     
