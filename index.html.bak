@@ -8,13 +8,13 @@
     <link rel="apple-touch-icon" sizes="76x76" href="/null">
     <link rel="icon" type="image/png" href="/null">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
-    <title>Links - Hexo</title>
+    <title>Hexo</title>
     
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     
     
     <meta name="description" content="">
-    <meta name="author" content="深度科研">
+    <meta name="author" content="John Doe">
     <meta name="keywords" content="">
     <style>
 
@@ -346,13 +346,6 @@ header .header__right .dropdown-menus .dropdown-menu {
     
 
     
-        <!--
-        <link rel="stylesheet" href="/css/page.css" media="print"
-            onload="this.media='all';this.onload=null">
-        <noscript>-->
-            <link rel="stylesheet" href="/css/page.css">
-        <!--</noscript>-->
-    
     
     <link rel="stylesheet" href="/css/main.css" media="print" onload="this.media='all';this.onload=null">
     <noscript>
@@ -368,7 +361,7 @@ header .header__right .dropdown-menus .dropdown-menu {
         <header>
             
 <div class="header__left">
-	<a href="/" class="button"><span class="logo__text"><a href="https://github.com/Jayzhou3219/Jayzhou3219.github.io/">Jayzhou3219</span></a>
+	<a href="/" class="button"><span class="logo__text">Theme Miracle</span></a>
 </div>
 <div class="header__right">
 	<div class="navbar__menus">
@@ -414,70 +407,81 @@ header .header__right .dropdown-menus .dropdown-menu {
         <div id="page-main" class="main-content">
         <div class="mg-top">
             
-<article class="page">
-<div id="post-meta-m" style="padding-bottom:0;">
-  <div class="post-meta" id="post-meta">
-    <h3>Links</h3>
-  </div>
+  <div id="index-banner" class="text-center middle-center">
+    <div class="banner-text">
+        <h3 id="banner-name">
+            Theme Miracle
+        </h3>
+        <p class="slogan">
+          一款简洁的单栏 Hexo 主题
+        </p>
+    </div>
 </div>
-<div class="links-page" style="padding-top:10px;" id="links-page">
-    
-    
-      <script>
-        (async () => {
-          var res = await fetch('');
-          var json = await res.json();
-          console.log(json);
-          const Linkscontainer = document.getElementById('links-page');
-          json.forEach(item => {
-            const element = document.createElement('div');
-            element.className = "links-card";
-
-            element.innerHTML = `
-        <a href="${item.link}" class="links-card-body" target="_blank" rel="noopener">
-          <div class="links-card-content">
-              <div class="link-avatar my-auto">
-                
-                  <img webp-comp class="lazyload-img" data-srcset="${item.image}" srcset="/img/loading.svg" src="${item.image}" alt="${item.title}" />
-                
-              </div>
-            <div class="link-text">
-              <div class="link-title">${item.title}</div>
-              <div class="link-intro">${item.intro}</div>
-            </div>
-          </div>
-        </a>
-            `;
-            Linkscontainer.appendChild(element);
-          });
-          setTimeout(function () {
-  function query(selector) {
-    return Array.from(document.querySelectorAll(selector));
-}
-    
-var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-        if (entry.isIntersecting) { 
-            var img = entry.target;
-            img.srcset = img.getAttribute('data-srcset');
-            img.className += ' loaded'
-            io.unobserve(img);
-        }
-    });
-});
-    
-query('.lazyload-img').forEach(function (item) {
-    io.observe(item);
-});
-},0)
-        })();
 
 
-      </script>
-    
+<div class="post-card-center">
+<div class="post-card-main">
+
+    <div class="index-card">
+      
+      <article class="index-card-info">
+        <h3 class="index-header">
+          <a href="/2022/07/12/CVPR%202020%20_%20Social-STGCNN%EF%BC%9A%E5%9F%BA%E4%BA%8E%E5%9B%BE%E5%8D%B7%E7%A7%AF%E7%9A%84%E8%A1%8C%E4%BA%BA%E8%BD%A8%E8%BF%B9%E9%A2%84%E6%B5%8B/">
+          
+          CVPR 2020 Social-STGCNN：基于图卷积的行人轨迹预测</a>
+        </h3>
+        <p class="index-excerpt">
+            
+            
+              
+            
+            原文链接：Social-STGCNN: A Social Spatio-Temporal Graph Convolutional NeuralNetwork for Human Trajectory Prediction代码链接：代码
+有一段时间没有更新博客了，这一段时间我在干嘛呢？回想起来除了每周定时的007外，只是单纯的懒。在写作风格上，坚持靠近于算法层面，而不是单纯的文章翻译、代码解析。那废
+        </p>
+        <div class="index-btm post-metas">
+          
+            
+              <time datetime="2022-07-12 22:24" pubdate>
+                2022-07-12
+              </time>
+            
+          
+          
+        </div>
+      </article>
+    </div>
+  
+    <div class="index-card">
+      
+      <article class="index-card-info">
+        <h3 class="index-header">
+          <a href="/2022/07/12/hello-world/">
+          
+          Hello World</a>
+        </h3>
+        <p class="index-excerpt">
+            
+            
+              
+            
+            Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
+Quick
+        </p>
+        <div class="index-btm post-metas">
+          
+            
+              <time datetime="2022-07-12 18:44" pubdate>
+                2022-07-12
+              </time>
+            
+          
+          
+        </div>
+      </article>
+    </div>
+  
 </div>
-  </div>
-</article>
+</div>
 
         </div>
         
@@ -487,7 +491,7 @@ query('.lazyload-img').forEach(function (item) {
     
     
     
-    <p>&copy;  2022.07.12&nbsp;&nbsp;<a href="https://blog.csdn.net/m0_57541899?spm=1010.2135.3001.5343/">深度科研</a>
+    <p>&copy;  2020 - 2021&nbsp;&nbsp;Theme Miracle</p>
     
     <p>Powered by <a href="https://hexo.io" target="_blank">Hexo</a> | Theme by <a href="https://github.com/hifun-team/hexo-theme-miracle" target="_blank">Miracle</a></p>
     
